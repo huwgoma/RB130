@@ -103,6 +103,31 @@ class TodoList
     selections
   end
 
+  def find_by_name(todo_name)
+    select { |todo| todo.name == todo_name }.first
+  end
+
+  def all_done
+    select(&:done?)
+  end
+
+  def all_not_done
+    select { |todo| !todo.done? }
+  end
+
+  def mark_done(todo_name)
+    todo = find_by_name(todo_name)
+    todo.done! if todo
+  end
+
+  def mark_all_done
+    each(&:done!)
+  end
+
+  def mark_all_undone
+    each(&:undone!)
+  end
+
   def to_a
     todos.dup
   end
@@ -118,3 +143,43 @@ class TodoList
 
   attr_reader :todos
 end
+
+
+todo1 = Todo.new("Buy milk")
+todo2 = Todo.new("Clean room")
+todo3 = Todo.new("Go to gym")
+
+list = TodoList.new("Today's Todos")
+list.add(todo1)
+list.add(todo2)
+list.add(todo3)
+
+# Find By Name
+list.find_by_name('Clean room') == todo2
+list.find_by_name('Study') == nil
+
+# All Done
+list.all_done #=> #<TodoList:0x00.. @todos = []>
+list.mark_done_at(0)
+list.all_done   #=> #<TodoList:0x00.. @todos = [#<Todo:0x00.. @name = 'Buy milk'>]> 
+
+# All Not Done
+list.all_not_done 
+#=> #<TDL:0x00.. @todos = [
+#     #<Todo:0x00 @name = 'Clean room'>,
+#     #<Todo:0x00 @name = 'Go to gym'>
+# ]>
+
+# Mark Done
+list.mark_done('Clean room')
+list.find_by_name('Clean room').done? == true
+list.mark_done('Study') #=> Do Nothing
+
+
+# Mark All Done
+list.mark_all_done
+list.all_not_done #=> #<TDL:0x00.. @todos = []>
+
+# Mark All Undone
+list.mark_all_undone
+list.all_done #=> #<TDL:0x00.. @todos = []>
