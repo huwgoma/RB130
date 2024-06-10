@@ -1,0 +1,80 @@
+                                                                      # (Partial Output)
+                                                                      $ tree /home/hugo/.rbenv
+                                                                      /home/hugo/.rbenv
+                                                                    shims ──┴── versions
+                                                               bundle ──┤       ├── 2.2.2
+                                                                  gem ──┤       |   ├── bin
+                                                                  irb ──┤       │   │   ├── bundle
+                                                               rubcop ──┤       │   |   ├── gem
+                                                                 ruby ──┘       |   |   ├── irb
+                                                                                |   |   ├── rubocop
+                                                                                |   |   └── ruby
+                                                                        3.2.2 ──┘   └── lib
+                                                                      bin ──┤          └── ruby
+                                                               bundle ──┤   |              └── gems
+                                                                  gem ──┤   |                  └── 2.2.0
+                                                                  irb ──┤   |                      └── gems
+                                                              rubocop ──┤   |                          ├── bundler-1.12.5
+                                                                 ruby ──┘   |                          ├── pry-0.10.4                       
+                                                                      lib ──┘                          |   └── lib
+                                                                 ruby ──┘                              |       └── pry.rb
+                                                             gems ──┘                                  └── rubocop-0.43.1           
+                                                        3.2.0 ──┘                                          
+                                                     gems ──┘
+                                       bundler-2.5.10 ──┤
+                                           pry-0.14.2 ──┤                            
+                                              lib ──┘   |
+                                       pry.rb ──┘       |                              
+                                       rubocop-1.51.0 ──┘                                            
+                                                                         
+
+
+
+
+└┘
+┼
+──┤
+
+# rbenv 
+$ tree /home/hugo/.rbenv 
+/home/hugo/.rbenv       # rbenv root directory
+├── shims
+│   ├── bundle
+│   ├── irb
+│   ├── rubocop
+│   └── ruby
+└── versions
+    ├── 2.2.2
+    │   ├── bin
+    │   │   ├── bundle
+    │   │   ├── irb
+    │   │   ├── rubocop
+    │   │   └── ruby
+    │   └── lib
+    │       └── ruby
+    │           └── gems
+    │               └── 2.2.0
+    │                   └── gems
+    │                       ├── bundler-1.12.5
+    │                       ├── freewill-1.0.0
+    │                       │   └── lib
+    │                       │       └── freewill.rb
+    │                       ├── pry-0.10.4
+    │                       └── rubocop-0.43.1
+    └── 2.3.1
+        ├── bin
+        │   ├── bundle
+        │   ├── irb
+        │   ├── rubocop
+        │   └── ruby
+        └── lib
+            └── ruby
+                └── gems
+                    └── 2.2.0
+                        └── gems
+                            ├── bundler-1.12.5
+                            ├── freewill-1.0.0
+                            │   └── lib
+                            │       └── freewill.rb
+                            ├── pry-0.10.4
+                            └── rubocop-0.45.0
