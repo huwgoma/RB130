@@ -1,6 +1,6 @@
-desc 'Say hello'
+# desc 'Hello'
 task :hello do
-  puts "hello!"
+  puts "Hello"
 end
 
 desc 'Say goodbye'
