@@ -1,0 +1,26 @@
+# Rakefile
+task :default => [:tests]
+
+desc 'Run all tests'
+task :tests do
+  puts 'Running the test suite...'
+end
+
+desc 'Backup the repository'
+task :backup do
+  puts 'Backing up the repository...'
+end
+
+desc 'Increment version no.'
+task :increment do
+  puts 'Incrementing the version number...'
+end
+
+desc 'Create update notes'
+task :notes do
+  puts 'Writing the update notes...'
+end
+
+desc 'Update'
+task :update => [:tests, :backup, :increment, :notes]
+

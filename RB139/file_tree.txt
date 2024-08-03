@@ -1,0 +1,41 @@
+                RVM Path (Partial Output)
+                    /user/local/rvm
+                  rubies ──┴── gems
+          ruby-3.2.2 ──┘       └── ruby-3.2.2
+             bin ──┘               ├── bin
+         gem ──┤                   |   ├─── bundle
+         irb ──┤                   |   └─── rubocop
+        ruby ──┘                   └── gems
+                                       ├─── bundler-2.5.10
+                                       └─── rubocop-1.51.0
+
+
+
+
+            rbenv root (Partial Output)
+                /home/hugo/.rbenv
+                shims ──┴── versions
+           bundle ──┤       └─── 3.2.2
+              gem ──┤            ├─── bin
+              irb ──┤            |    ├─── bundle
+             ruby ──┤            |    ├─── gem 
+          rubocop ──┘            |    ├─── irb
+                                 |    ├─── rubocop
+                                 |    └─── ruby
+                                 └─── lib
+                                      └─── ruby
+                                           └─── gems
+                                                └─── 3.2.0
+                                                     └─── gems
+                                                          ├─── bundler-2.5.10
+                                                          └─── rubocop-1.51.0
+
+ruby 3.2.2
+ ...
+   └─── gems
+        └─── rubocop-1.51.0
+             └─── lib
+                  └─── rubocop.rb
+
+         
+       
