@@ -69,33 +69,103 @@
 # - Instantiate a new CLock object
 require 'pry'
 
+# class Clock
+#   MINUTES_RANGE = 0...1440
+
+#   def self.at(hour, minute = 0)
+#     self.new(hour, minute)
+#   end
+
+  
+
+#   def initialize(hour, minute = 0)
+#     @hour, @minute = hour, minute
+#     @working_minutes = (hour * 60) + minute
+#   end
+
+#   def +(minutes_to_add)
+#     new_time = working_minutes + minutes_to_add
+#     new_time = overflow_minutes(new_time) if new_time > MINUTES_RANGE.max
+
+#     new_hour, new_minute = new_time.divmod(60)
+#     Clock.new(new_hour, new_minute)
+#   end
+
+#   def -(minutes_to_subtract)
+#     new_time = working_minutes - minutes_to_subtract
+#     new_time = underflow_minutes(new_time) if new_time < MINUTES_RANGE.min
+
+#     new_hour, new_minute = new_time.divmod(60)
+#     Clock.new(new_hour, new_minute)
+#   end
+
+#   def ==(other_clock)
+#     hour == other_clock.hour && minute == other_clock.minute
+#   end
+
+#   def to_s
+#     format("%02d:%02d", hour, minute)
+#   end
+
+#   protected attr_reader :hour, :minute, :working_minutes
+
+#   private
+
+#   def overflow_minutes(minutes)
+#     minutes % 1440
+#   end
+
+#   def underflow_minutes(minutes)
+#     1440 - (minutes.abs % 1440)
+#   end
+# end
+
+
+# ===============================
+# Refactor: Try to reduce repetition between + and -.
+# Method that onverts minutes to hour + minute
+# - Input: Integer representing the number of minutes
+# - Output: 2-element array with hour and minute as elements.
+
 class Clock
+  MINUTES_IN_HOUR = 60
   MINUTES_RANGE = 0...1440
 
   def self.at(hour, minute = 0)
     self.new(hour, minute)
   end
 
-  
-
   def initialize(hour, minute = 0)
     @hour, @minute = hour, minute
-    @working_minutes = (hour * 60) + minute
+    @minutes_since_midnight = (hour * MINUTES_IN_HOUR) + minute
   end
 
-  def +(minutes_to_add)
-    new_time = working_minutes + minutes_to_add
-    new_time = overflow_minutes(new_time) if new_time > MINUTES_RANGE.max
+  def calculate_new_total_minutes(operator, minutes)
+    #binding.pry
+    new_minutes = operator.to_proc.call(self.minutes_since_midnight, minutes)
+    new_minutes = wrap(new_minutes) unless MINUTES_RANGE.include?(new_minutes)
+    new_minutes
+  end
 
-    new_hour, new_minute = new_time.divmod(60)
+  def wrap(minutes)
+    if minutes > MINUTES_RANGE.max
+      overflow(minutes )
+    elsif minutes < MINUTES_RANGE.min
+      underflow(minutes)
+    end
+  end
+
+  def +(minutes)
+    new_total_minutes = calculate_new_total_minutes(:+, minutes)
+
+    new_hour, new_minute = minutes_to_hour_and_minute(new_total_minutes)
     Clock.new(new_hour, new_minute)
   end
 
-  def -(minutes_to_subtract)
-    new_time = working_minutes - minutes_to_subtract
-    new_time = underflow_minutes(new_time) if new_time < MINUTES_RANGE.min
+  def -(minutes)
+    new_total_minutes = calculate_new_total_minutes(:-, minutes)
 
-    new_hour, new_minute = new_time.divmod(60)
+    new_hour, new_minute = minutes_to_hour_and_minute(new_total_minutes)
     Clock.new(new_hour, new_minute)
   end
 
@@ -107,15 +177,21 @@ class Clock
     format("%02d:%02d", hour, minute)
   end
 
-  protected attr_reader :hour, :minute, :working_minutes
+  protected attr_reader :hour, :minute, :minutes_since_midnight
 
   private
 
-  def overflow_minutes(minutes)
+  def minutes_to_hour_and_minute(minutes)
+    minutes.divmod(60)
+  end
+
+  def overflow(minutes)
     minutes % 1440
   end
 
-  def underflow_minutes(minutes)
+  def underflow(minutes)
     1440 - (minutes.abs % 1440)
   end
 end
+
+# Refactor on revisit: Always wrap minutes; leave it alone if it is in range.

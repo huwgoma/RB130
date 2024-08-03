@@ -28,7 +28,7 @@ class ClockTest < Minitest::Test
   end
 
   def test_subtract_fifty_minutes
-    
+  
     clock = Clock.at(0) - 50
     assert_equal '23:10', clock.to_s
   end
