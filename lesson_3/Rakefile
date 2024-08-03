@@ -1,12 +1,26 @@
-# desc 'Hello'
-task :hello do
-  puts "Hello"
+task :default => [:tests]
+
+desc "Run all tests"
+task :tests do
+  puts "Running the test suite..."
 end
 
-desc 'Say goodbye'
-task :goodbye do
-  puts "goodbye!"
+desc "Increment version number"
+task :increment do
+  puts "Incrementing version number..."
 end
 
-desc 'default'
-task :default => [:hello, :goodbye]
+desc "Create release notes"
+task :notes do
+  puts "Creating release notes"
+end
+
+desc "Create backup of repo"
+task :backup do
+  puts "Creating backup of project repository..."
+end
+
+desc "Release"
+task :release => [:tests, :increment, :notes, :backup]
+
+
