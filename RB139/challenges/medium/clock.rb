@@ -194,4 +194,10 @@ class Clock
   end
 end
 
-# Refactor on revisit: Always wrap minutes; leave it alone if it is in range.
+# Refactor on revisit:
+# #initialize is technically never called with hour+minute - only ::at is called
+#   with 2 arguments (hr + min)
+# - Internally, we can always represent the time in pure minutes.
+#   - Only when we ask for a string representation of the time (to_s) do we need to
+#     actually convert pure_minutes to hours and minutes.
+#   - So hours and minutes dont have to be instance variables; only locals in to_s  
