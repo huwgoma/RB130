@@ -127,62 +127,131 @@ require 'pry'
 # - Input: Integer representing the number of minutes
 # - Output: 2-element array with hour and minute as elements.
 
+# class Clock
+#   MINUTES_IN_HOUR = 60
+#   MINUTES_RANGE = 0...1440
+
+#   def self.at(hour, minute = 0)
+#     self.new(hour, minute)
+#   end
+
+#   def initialize(hour, minute = 0)
+#     @hour, @minute = hour, minute
+#     @minutes_since_midnight = (hour * MINUTES_IN_HOUR) + minute
+#   end
+
+#   def calculate_new_total_minutes(operator, minutes)
+#     new_minutes = operator.to_proc.call(self.minutes_since_midnight, minutes)
+#     MINUTES_RANGE.include?(new_minutes) ? new_minutes : wrap(new_minutes)
+#   end
+
+#   def wrap(minutes)
+#     if minutes > MINUTES_RANGE.max
+#       overflow(minutes)
+#     elsif minutes < MINUTES_RANGE.min
+#       underflow(minutes)
+#     end
+#   end
+
+#   def +(minutes)
+#     new_total_minutes = calculate_new_total_minutes(:+, minutes)
+
+#     new_hour, new_minute = minutes_to_hour_and_minute(new_total_minutes)
+#     Clock.new(new_hour, new_minute)
+#   end
+
+#   def -(minutes)
+#     new_total_minutes = calculate_new_total_minutes(:-, minutes)
+
+#     new_hour, new_minute = minutes_to_hour_and_minute(new_total_minutes)
+#     Clock.new(new_hour, new_minute)
+#   end
+
+#   def ==(other_clock)
+#     hour == other_clock.hour && minute == other_clock.minute
+#   end
+
+#   def to_s
+#     format("%02d:%02d", hour, minute)
+#   end
+
+#   protected attr_reader :hour, :minute, :minutes_since_midnight
+
+#   private
+
+#   def minutes_to_hour_and_minute(minutes)
+#     minutes.divmod(60)
+#   end
+
+#   def overflow(minutes)
+#     minutes % 1440
+#   end
+
+#   def underflow(minutes)
+#     1440 - (minutes.abs % 1440)
+#   end
+# end
+
+
+# =============================
+# Refactor on revisit:
+# #initialize is technically never called with hour+minute - only ::at is called
+#   with 2 arguments (hr + min)
+# - Internally, we can always represent the time in pure minutes.
+#   - Only when we ask for a string representation of the time (to_s) do we need to
+#     actually convert pure_minutes to hours and minutes.
+#   - So hours and minutes dont have to be instance variables; only locals in to_s
+
 class Clock
   MINUTES_IN_HOUR = 60
-  MINUTES_RANGE = 0...1440
+  MAX_MINUTE_VALUE = 1439
+  MIN_MINUTE_VALUE = 0
 
   def self.at(hour, minute = 0)
-    self.new(hour, minute)
+    Clock.new((hour * MINUTES_IN_HOUR) + minute)
   end
 
-  def initialize(hour, minute = 0)
-    @hour, @minute = hour, minute
-    @minutes_since_midnight = (hour * MINUTES_IN_HOUR) + minute
+  def initialize(minute_value)
+    @minute_value = minute_value
   end
 
-  def calculate_new_total_minutes(operator, minutes)
-    #binding.pry
-    new_minutes = operator.to_proc.call(self.minutes_since_midnight, minutes)
-    new_minutes = wrap(new_minutes) unless MINUTES_RANGE.include?(new_minutes)
-    new_minutes
+  def +(minutes_to_add)
+    minutes_sum = calculate_new_minute_value(:+, minutes_to_add)
+    Clock.new(minutes_sum)
   end
 
-  def wrap(minutes)
-    if minutes > MINUTES_RANGE.max
-      overflow(minutes )
-    elsif minutes < MINUTES_RANGE.min
-      underflow(minutes)
-    end
-  end
-
-  def +(minutes)
-    new_total_minutes = calculate_new_total_minutes(:+, minutes)
-
-    new_hour, new_minute = minutes_to_hour_and_minute(new_total_minutes)
-    Clock.new(new_hour, new_minute)
-  end
-
-  def -(minutes)
-    new_total_minutes = calculate_new_total_minutes(:-, minutes)
-
-    new_hour, new_minute = minutes_to_hour_and_minute(new_total_minutes)
-    Clock.new(new_hour, new_minute)
+  def -(minutes_to_subtract)
+    minutes_diff = calculate_new_minute_value(:-, minutes_to_subtract)
+    Clock.new(minutes_diff)
   end
 
   def ==(other_clock)
-    hour == other_clock.hour && minute == other_clock.minute
+    minute_value == other_clock.minute_value
   end
 
   def to_s
+    hour, minute = minute_value.divmod(MINUTES_IN_HOUR)
     format("%02d:%02d", hour, minute)
   end
 
-  protected attr_reader :hour, :minute, :minutes_since_midnight
+  protected attr_reader :minute_value
 
   private
 
-  def minutes_to_hour_and_minute(minutes)
-    minutes.divmod(60)
+  def calculate_new_minute_value(operator, minutes)
+    new_minute_value = operator.to_proc.call(minute_value, minutes)
+
+    if new_minute_value.between?(MIN_MINUTE_VALUE, MAX_MINUTE_VALUE)
+      new_minute_value
+    else
+      wrap(new_minute_value)
+    end
+  end
+
+  def wrap(minutes)
+    return overflow(minutes) if minutes > MAX_MINUTE_VALUE
+    return underflow(minutes) if minutes < MIN_MINUTE_VALUE
+    minutes
   end
 
   def overflow(minutes)
@@ -193,11 +262,3 @@ class Clock
     1440 - (minutes.abs % 1440)
   end
 end
-
-# Refactor on revisit:
-# #initialize is technically never called with hour+minute - only ::at is called
-#   with 2 arguments (hr + min)
-# - Internally, we can always represent the time in pure minutes.
-#   - Only when we ask for a string representation of the time (to_s) do we need to
-#     actually convert pure_minutes to hours and minutes.
-#   - So hours and minutes dont have to be instance variables; only locals in to_s  

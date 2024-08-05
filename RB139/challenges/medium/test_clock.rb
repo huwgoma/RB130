@@ -5,6 +5,7 @@ require_relative 'clock'
 
 class ClockTest < Minitest::Test
   def test_on_the_hour
+    
     assert_equal '08:00', Clock.at(8).to_s
     assert_equal '09:00', Clock.at(9).to_s
   end
@@ -28,7 +29,7 @@ class ClockTest < Minitest::Test
   end
 
   def test_subtract_fifty_minutes
-  
+    
     clock = Clock.at(0) - 50
     assert_equal '23:10', clock.to_s
   end
