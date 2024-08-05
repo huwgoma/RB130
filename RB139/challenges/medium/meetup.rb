@@ -169,54 +169,83 @@ require 'pry'
 #     current date. Otherwise:
 #   - Increment date by 1 day and repeat.
 
-class Meetup
-  FIRST_DAY_OF_NTH_WEEK = {
-    'first' => 1, 'second' => 8, 'third' => 15, 
-    'fourth' => 22, 'fifth' => 29, 'teenth' => 13
-  }
+# class Meetup
+#   FIRST_DAY_OF_NTH_WEEK = {
+#     'first' => 1, 'second' => 8, 'third' => 15, 
+#     'fourth' => 22, 'fifth' => 29, 'teenth' => 13
+#   }
   
+#   def initialize(year, month)
+#     @year, @month = year, month
+#   end
+
+#   def day(x_day, nth)
+#     day_checker = correct_day(x_day)
+
+#     last_date_of_month = Date.new(year, month, -1)
+#     first_possible_date = Date.new(year, month, first_day_of_nth_week(nth))
+#     first_possible_date.step(last_date_of_month) do |date|
+#       return date if day_checker.call(date)
+#     end
+    
+#     nil
+#   end
+
+#   private
+
+#   attr_reader :year, :month
+
+#   def day_checker(x_day)
+#     (x_day.downcase + '?').to_sym.to_proc
+#   end
+
+#   def first_day_of_nth_week(nth)
+#     case nth.downcase
+#     when 'last' then first_day_of_last_week
+#     else             FIRST_DAY_OF_NTH_WEEK[nth.downcase]
+#     end
+#   end
+
+#   def first_day_of_last_week
+#     Date.new(year, month, -1).prev_day(6).day
+#   end
+# end
+
+
+# ===========================
+# Refactor:
+# 1) Select all of the specified weekdays in the given month.
+# 2) Find the date corresponding to the specified nth (first) descriptor
+
+#   Exceptions: Last and teenth
+#   - Last: Select all specified weekdays in the given month, then pick the last one
+#   - Teenth: Select all specified weekdays in the given month, then find the one whose 
+#     day is between 13 and 19.
+
+class Meetup
+  NTH_DESCRIPTORS = ['first', 'second', 'third', 'fourth', 'fifth']
+
   def initialize(year, month)
     @year, @month = year, month
+    @days_in_month = Date.new(year, month)..Date.new(year, month, -1)
   end
 
-  def day(x_day, nth)
-    day_checker = correct_day(x_day)
+  def day(x_day, nth_descriptor)
+    x_day, nth_descriptor = x_day.downcase, nth_descriptor.downcase
 
-    last_date_of_month = Date.new(year, month, -1)
-    first_possible_date = Date.new(year, month, first_day_of_nth_week(nth))
-    first_possible_date.step(last_date_of_month) do |date|
-      return date if day_checker.call(date)
-    end
-    
-    nil
-  end
+    day_checker = (x_day + '?').to_sym.to_proc
+    x_days_in_month = days_in_month.select(&day_checker)
 
-  private
-
-  attr_reader :year, :month
-
-  def correct_day(x_day)
-    (x_day.downcase + '?').to_sym.to_proc
-  end
-
-  def first_day_of_nth_week(nth)
-    case nth.downcase
-    when 'first'  then 1
-    when 'second' then 8
-    when 'third'  then 15
-    when 'fourth' then 22
-    when 'fifth'  then 29
-    when 'teenth' then 13
-    when 'last'     then first_day_of_last_week
+    case nth_descriptor
+    when 'teenth' then x_days_in_month.find { |date| date.day.between?(13, 19) }
+    when 'last'   then x_days_in_month.last
+    else               x_days_in_month[NTH_DESCRIPTORS.index(nth_descriptor)]
     end
   end
 
-  def first_day_of_last_week
-    Date.new(year, month, -1).prev_day(6).day
-  end
+  private attr_reader :year, :month, :days_in_month
+  
 end
-
-
 
 
 
