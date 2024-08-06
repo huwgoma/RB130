@@ -36,13 +36,11 @@ class LinkedListTest < Minitest::Test
   end
 
   def test_empty_list_empty
-    
     list = SimpleLinkedList.new
     assert list.empty?
   end
 
   def test_pushing_element_on_list
-    
     list = SimpleLinkedList.new
     list.push(1)
     assert_equal 1, list.size
@@ -56,7 +54,7 @@ class LinkedListTest < Minitest::Test
   end
 
   def test_peeking_at_list
-    
+
     list = SimpleLinkedList.new
     list.push(1)
     assert_equal 1, list.size
@@ -64,13 +62,13 @@ class LinkedListTest < Minitest::Test
   end
 
   def test_peeking_at_empty_list
-    
+
     list = SimpleLinkedList.new
     assert_nil list.peek
   end
 
   def test_access_head_element
-    
+
     list = SimpleLinkedList.new
     list.push(1)
     assert_instance_of Element, list.head
@@ -79,7 +77,7 @@ class LinkedListTest < Minitest::Test
   end
 
   def test_items_are_stacked
-    
+
     list = SimpleLinkedList.new
     list.push(1)
     list.push(2)
@@ -89,7 +87,7 @@ class LinkedListTest < Minitest::Test
   end
 
   def test_push_10_items
-    
+
     list = SimpleLinkedList.new
     (1..10).each do |datum|
       list.push(datum)
@@ -99,7 +97,7 @@ class LinkedListTest < Minitest::Test
   end
 
   def test_pop_1_item
-    
+
     list = SimpleLinkedList.new
     list.push(1)
     assert_equal 1, list.pop

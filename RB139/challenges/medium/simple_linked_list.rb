@@ -1,75 +1,59 @@
-# Simple Linked List
-# The linked list is a fundamental data structure in computer science. The simplest
-# linked list is a single-linked list:
-# - Each element in the list contains some data and a NEXT field, pointing to the 
-#   next element in the list.
-
-# Create a single-linked list whose elements may contain a range of data (eg. 1-10)
-# - Provide methods to reverse the list, and convert the list to/from an Array.
-
-# Two Classes: Element and SimpleLinkedList
-# Element:
-# - Takes 1-2 arguments (datum and next); has accessors for both
-# - #tail? method returns true if the element has no next element (?)
-# SimpleLinkedList
-# - No arguments on construction
-# - #size returns number of elements
-# - #empty? returns true if size == 0
-# - #push creates and adds an Element to the FRONT of the list
-#   - Link the current element's next to previous element
-# - #peek returns the datum of the FIRST element (?)
-# - #head returns the FIRST Element (?)
-# - #pop removes and returns the FIRST element from the list
-
-# - ::from_a:
-#   - Accepts an array and instantiates a new SimpleLinkedList with @list = array
-#   - If nil, @list = empty array
-
-# - #to_a: Returns an array representing the elements in the list
-# - #reverse: Return a NEW LinkedList object with list elements reversed
-#   - Reverse the next associations too
-
-
-# Data/Algorithm:
-# Element: @datum and @next
-# - @next defaults to nil unless given
-# List:
-# #initialize may accept an optional argument
-# - If argument is an array, @list = array. Otherwise @list = []
-# #push:
-# - Create an element from the given data; @datum = datum, @next = the current
-#   first element in the list (ie. @list.first / head)
-# #pop:
-# - Remove the first element from the list; set its @next to nil
-
-# ::from_a: Given Array or nil (to_a => [])
-# list = [], array [1, 2]
-# Output => [Ele(d = 1, n = Ele(2)), Ele(d = 2, n = nil)]
-# Iterate through each element in array in reverse order; for each element:
-# - Create element from current object; next = first item in list 
-# - Add element to front of list
-# - Instantiate new LinkedList with @list = list
-
-# to_a: 
-# - Return @list (i think?) -- return @list's datum values
-
-# #reverse:
-# - Reverse @array and map duplicate each element
-#   [Ele(D: 1, N: Ele 2), Ele(D: 2, N: nil)] 
-#   => [Ele(D: 2, N: nil), Ele(D: 1, N: Ele 2)]
-
-# Iterate through reversed duped array, 2 elements at a time (overlap). For each pair:
-# [ele3, ele2], [ele2, ele1]
-# - Set the first Element's @next to the second element
-# EOI:
-# - Set the last Elements @next to nil.
-
-
-
-# [1 -> 2 -> 3]
-# [3 -> 2 -> 1]
-
 require 'pry'
+# Simple Linked List
+# - A single-linked list consists of one or more Elemenets. 
+# - Each Element contains some data and a Next attribute, pointing to the 
+#   next element in the sequence.
+# - Elements are in LIFO order; they are added and removed to/from the top
+#   of the stack (ie. the last added element is the first to be removed)
+
+# [1 <- 2 <- 3] <- 4 | [1 <- 2 <- 3 <- 4]
+# tail      head       tail           head
+
+# Rules:
+# - Do not use an Array.
+# Element: @datum and @next (default nil).
+# - #tail? returns true if self is at the bottom of the list (ie. next is nil)
+# LinkedList:
+#   @head: Points to the top Element of the list 
+#   #size: Returns the 'size' of the List; start at @head (size = 0) and increment
+#     size until Element#tail? returns true.
+#   #empty?: Check if #size is 0.
+#   
+#   #push: Push an Element to the Top of the List.
+#     - Create an Element with the given @datum; set @next to the current @head;
+#       set @head to the newly-created and added Element.
+#   #peek: Return the @datum of the @head element.
+#   
+#   #pop: Remove an Element from the Top of the List, and return its @datum
+#     - Isolate the current @head Element; Reassign @head to the current @head's
+#       @next Element.
+#     - Set old head Element's @next to nil.
+
+#   ::from_a: Takes an Array (or nil; convert with to_a) as input and outputs a 
+#     new LinkedList object consisting of the elements from the given Array.
+#   - Elements are pushed in reverse order. 
+#     [1, 2, ..., 9, 10] => [10 <- 9 <-... <- 2 <- 1] head
+
+#     - Instantiate a new Linked List (@head = nil)
+#     - Reverse the array, then iterate through array. For each object:
+#       - Create an element with @datum = object and @next = @head.
+#       - Assign @head to the newly-created + Pushed Element.
+#       (#push)
+
+#   #to_a: Returns an Array representing the linked Elements.
+#     LL: [3 <- 2 <- 1]  => A: [1, 2, 3]
+#   - Elements are added to the array from @head to tail.
+#   - Start from element = @head; add the current Element's @datum to the array;
+#     Reassign element to element.next and repeat until element.next is nil
+
+#   #reverse: Reverse a Linked List and return it as a new linked list 
+#   [3 <- 2 <- 1] => [1 <- 2 <- 3]
+#   - Instantiate a new Linked List
+#   - Start at the element = @head of self Linked List 
+#     - Create an Element with @datum = element.datum, @next = new_list.head
+#     - Set new list @head to newly-pushed Element
+#   - Reassign element to element.next
+#   - Stop when element.next is nil.
 
 class Element
   attr_reader :datum
@@ -80,81 +64,69 @@ class Element
   end
 
   def tail?
-    !self.next
+    @next.nil?
   end
 end
 
 class SimpleLinkedList
   def self.from_a(array)
-    list = []
-
-    array.to_a.reverse_each do |obj|
-      element = Element.new(obj, list.first)
-      list.unshift(element)
-    end
-
-    self.new(list)
+    new_list = self.new
+    array.to_a.reverse_each { |obj| new_list.push(obj) }
+    new_list
   end
 
-  attr_reader :array
+  attr_accessor :head
 
-  def initialize(array = [])
-    @array = array
-  end
-
-  def size
-    array.size
-  end
-
-  def empty?
-    array.empty?
+  def initialize
+    @head = nil
   end
 
   def push(obj)
     element = Element.new(obj, head)
-    array.unshift(element)
-  end
-
-  def head
-    array.first
-  end
-
-  def peek
-    head&.datum
+    self.head = element
   end
 
   def pop
-    removed_item = array.shift
-    removed_item.next = nil
-    removed_item.datum
+    element = head
+    self.head = element.next
+    element.next = nil
+    element.datum
+  end
+
+  def peek
+    head.datum if head
+  end
+
+  def size
+    count = 0
+    each { count += 1 }
+    count
+  end
+
+  def empty?
+    size.zero?
   end
 
   def reverse
-    reversed_copy = array.reverse_each.map(&:dup) 
-    reversed_copy.each_cons(2) do |ele1, ele2|
-      ele1.next = ele2
-    end
-    reversed_copy.last.next = nil
-
-    self.class.new(reversed_copy)
+    new_list = self.class.new
+    each { |ele| new_list.push(ele.datum) }
+    new_list
   end
 
   def to_a
-    array.map(&:datum)
+    array = []
+    each { |ele| array << ele.datum }
+    array
+  end
+
+  private
+
+  def each
+    element = head
+    until element.nil?
+      yield(element) if block_given?
+      element = element.next  
+    end
+    self
   end
 end
-
-
-# ==========================
-# Launch School Solution
-# - Single-linked list: Each element only knows about the NEXT element in the list, 
-#   referenced by the #next field.
-# - 
-
-# - Element: 
-#   - Expects at least one argument (data)
-#   - Second optional argument is another Element (next element)
-#   - Newer elements will be placed BEFORE the preceding elements (LIFO)
-#   - #tail? Returns true if the current element is the TAIL of the list (ie. does
-#     not have a next element)
-# 
